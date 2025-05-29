@@ -2,12 +2,12 @@ import React from "react";
 import YouTube from "react-youtube";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from 'next/link'; // if you're using Next.js
 
 const opts = {
   height: "390",
   width: "640",
   playerVars: {
-    // https://developers.google.com/youtube/player_parameters
     autoplay: 0,
   },
 };
@@ -20,8 +20,6 @@ function ChapterContent({ chapter, content }) {
   let parsedContent = null;
   if (content?.content) {
     try {
-      // If content.content is already an object (from DB driver), use it directly
-      // Otherwise, try to parse it from a string
       parsedContent = typeof content.content === 'string'
         ? JSON.parse(content.content)
         : content.content;
@@ -29,6 +27,8 @@ function ChapterContent({ chapter, content }) {
       console.error("Failed to parse content:", error);
     }
   }
+
+  const courseId = chapter?.courseId;
 
   return (
     <div className="p-10">
@@ -56,7 +56,6 @@ function ChapterContent({ chapter, content }) {
             {item.title}
           </h2>
 
-          {/* render explanation as Markdown */}
           {item.explanation && (
             <div className="my-3 prose">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -72,7 +71,32 @@ function ChapterContent({ chapter, content }) {
           )}
         </section>
       ))}
+
+      {/* Take Quiz button that uses current URL structure */}
+      <div className="mt-6">
+        {courseId ? (
+          <Link href={`/course/${courseId}/start/quiz`}>
+            <button className="bg-primary hover:bg-purple-300 text-white font-bold py-2 px-4 rounded">
+              Take Quiz
+            </button>
+          </Link>
+        ) : (
+          <button
+            className="bg-primary hover:bg-purple-300 text-white font-bold py-2 px-4 rounded"
+            onClick={() => {
+              const currentPath = window.location.pathname;
+              const cleanPath = currentPath.endsWith('/')
+                ? currentPath.slice(0, -1)
+                : currentPath;
+              window.location.href = `${cleanPath}/quiz`;
+            }}
+          >
+            Take Quiz
+          </button>
+        )}
+      </div>
     </div>
   );
 }
+
 export default ChapterContent;

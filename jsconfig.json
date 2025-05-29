@@ -1,5 +1,13 @@
+// {
+//   "compilerOptions": {
+//     "paths": {
+//       "@/*": ["./*"]
+//     }
+//   }
+// }
 {
   "compilerOptions": {
+    "baseUrl": ".",             // 👈 Required for paths to work
     "paths": {
       "@/*": ["./*"]
     }
